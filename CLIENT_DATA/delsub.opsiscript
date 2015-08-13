@@ -1,0 +1,57 @@
+; Copyright (c) uib gmbh (www.uib.de)
+; This sourcecode is owned by uib gmbh
+; and published under the Terms of the General Public License.
+; credits: http://www.opsi.org/credits/
+
+Message "Searching installation of " + $ProductName$ + " 32 Bit..."
+Set $SearchPattern$ = $ProductName$
+; Parameter: $SearchPattern$ Suchbegriff in Registry
+Sub_search_registry32_uninstall_keys
+; Rückgabewert: $ResultList$ gefundene Einträge
+	
+if ( count ($ResultList$) = "0" )
+	comment "No installations of " + $SearchPattern$ + " found in registry. Nothing to do ;-)"
+else
+	if (count($ResultList$) = "1")
+		Message "Uninstalling " + $ProductName$ + " 32 Bit..."
+		Set $RegId$ = takeSTring(0, $ResultList$)
+
+		Set $UninstallProgram$ = GetRegistryStringValue32("[" + $RegPathUninstall$ + "\" + $RegId$ + "] UninstallString")
+		Set $InstallDir$ = ExtractFilePath($UninstallProgram$)
+		Winbatch_uninstall
+		sub_check_exitcode
+
+		; notwendig, da uninstaller ein paar dateien/verzeichnisse vergisst
+		comment "Delete files"
+		Files_uninstall
+
+		set $DesktopIcon$ = getProductProperty("desktopicon","no")
+		if $DesktopIcon$ = "yes"
+			comment "Delete common desktop icon"
+			Linkfolder_uninstall_desktopicon	
+		endif
+
+		comment "include custom post deinstall file"
+		set $CustomPostDeinstall$ = getProductProperty("custom-post-deinstall","none")
+		if not ($CustomPostDeinstall$ = "none")
+			if FileExists("%ScriptPath%\custom\" + $CustomPostDeinstall$)
+				include_insert "%ScriptPath%\custom\" + $CustomPostDeinstall$
+			endif
+		endif
+	else
+		logError "Found more than one installation! This case is not intended yet in this script! Stop now."
+		isFatalError
+	endif
+endif
+
+[Winbatch_uninstall]
+"$UninstallProgram$" /S
+
+[Files_uninstall]
+delete -sf "$InstallDir$\"
+
+[Linkfolder_uninstall_desktopicon]
+set_basefolder common_desktopdirectory
+set_subfolder ""
+delete_element $ProductName$
+

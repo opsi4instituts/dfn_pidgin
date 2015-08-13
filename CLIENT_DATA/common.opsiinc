@@ -1,0 +1,45 @@
+requiredWinstVersion >= "4.11.4.3"
+
+DefVar $UninstallProgram$
+DefVar $InstallProgram$
+DefVar $LogDir$
+DefVar $ProductId$
+DefVar $ProductName$
+DefVar $MinimumSpace$
+DefVar $InstallDir$
+DefVar $PathToExe$
+DefVar $ExitCode$
+DefVar $RegPathUninstall$
+DefVar $RegId$
+DefVar $MSVersion$
+DefVar $INST_architecture$
+DefVar $INST_SystemType$
+DefVar $CustomPostInstall$
+DefVar $CustomPostDeinstall$
+DefVar $DesktopIcon$
+DefVar $SearchPattern$
+DefStringList $ResultList$
+
+Set $INST_SystemType$ = GetSystemType
+set $INST_architecture$ = GetProductProperty("install_architecture","system specific")
+Set $MSVersion$	 = GetMsVersionInfo
+Set $LogDir$ = "%opsiLogDir%"
+
+; ----------------------------------------------------------------
+Set $ProductId$ = "dfn_pidgin"
+Set $ProductName$ = "Pidgin"
+Set $MinimumSpace$ = "60 MB"
+Set $RegPathUninstall$ = "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall"
+Set $InstallProgram$ = "pidgin-2.10.11-offline.exe"
+; ----------------------------------------------------------------
+
+include_append "section_sub_check_exitcode.opsiinc"
+include_append "section_sub_search_registry32_uninstall_keys.opsiinc"
+
+if not ($MSVersion$ = "6.1")
+	Logwarning "OPSI package only tested with windows 7! Please report successful usage on other windows versions to the maintainer."
+endif
+	
+if not (($INST_SystemType$ = "64 Bit System") and (($INST_architecture$ = "system specific") or ($INST_architecture$ = "both") or ($INST_architecture$ = "64 only")))
+	Logwarning "OPSI package only tested with windows 64 bit version! Please report successful usage on windows 32 bit version to the maintainer."
+endif
