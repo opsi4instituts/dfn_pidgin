@@ -69,7 +69,7 @@ dfn_pidgin (2.13.0-2)
 	* neue Registrysuche (https://github.com/opsi4instituts/lib)
 	* Check Version (Paket <-> Installation)
 	* uib_exitcode
- -- Thomas Besser (archIT/KIT) <thomas.besser@kit.edu>, 13.08.2015
+ -- Thomas Besser (archIT/KIT) <thomas.besser@kit.edu>, 12.07.2018
 
 dfn_pidgin (2.13.0-1)
 	* major update
@@ -77,7 +77,7 @@ dfn_pidgin (2.13.0-1)
 	* simple $ProductVersion$
 	* killtask in delsub
 	* Message mit "new|old %installingProdName% "
- -- Detlef Krummel <krummel@gei.de>, 12.07.2017
+ -- Detlef Krummel <krummel@gei.de>, 12.07.2018
 
 dfn_pidgin (2.12.0-006)
 	* major update
