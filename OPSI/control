@@ -1,15 +1,14 @@
 [Package]
 version: 1
 depends: 
-incremental: False
 
 [Product]
 type: localboot
 id: dfn_pidgin
-name: Pidgin
+name: Pidgin Multiplattform/Muliprotokoll Messenger
 description: Kommunikationsprogramm für Chat und Instant-Messaging (IM) unterschiedlichster Protokolle (XMPP/Jabber, IRC, ICQ, MSN, ...)
 advice: 
-version: 2.10.11
+version: 2.13.0
 priority: 0
 licenseRequired: False
 productClasses: 
@@ -67,17 +66,31 @@ values: ["auto", "de", "en"]
 default: ["auto"]
 
 [Changelog]
-pidgin (2.10.11-1)
+pidgin (2.13.0-1)
+	* major update
+	* del *.png, cp o4i.png + showbitmap local logo
+	* simple $ProductVersion$
+	* killtask in delsub
+	* Message mit "new|old %installingProdName% "
+ -- Detlef Krummel <krummel@gei.de>, 12.07.2017
+
+pidgin (2.12.0-006)
+	* major update
+ -- Detlef Krummel <krummel@gei.de>, 10.03.2017
+
+ pidgin (2.11.0-005)
+	* major update
+	* new o4i Logo 6/2016
+ -- Detlef Krummel <krummel@gei.de>, 02.01.2016
+
+ pidgin (2.10.12-004)
+	* minor update
+	* Installfile = Pattern + $ProductVersion$
+	* Check Minimumspace, FileExists = isFatalError
+	* ShowBitmap, Message modifiziert
+	* symb.Link auf dfn_ innerhalb von CLIENT_DATA
+ -- Detlef Krummel <krummel@gei.de>, 02.01.2016
+
+ pidgin (2.10.11-1)
 	* Initiales DFN-Paket
  -- Thomas Besser (archIT/KIT) <thomas.besser@kit.edu>, 13.08.2015
-
-
-
-
-
-
-
-
-
-
-

@@ -7,20 +7,26 @@
 ; common Values for (un)installation
 include_insert "common.opsiinc"
 
+ChangeDirectory "%SCRIPTPATH%"
 if not(HasMinimumSpace ("%SystemDrive%", $MinimumSpace$))
-	LogError "Not enough space on %SystemDrive%, " + $MinimumSpace$ + " on drive %SystemDrive% needed for " + $ProductId$
-	isFatalError
-	; Stop process and set installation status to failed
+        LogError "Not enough space on %SystemDrive%, " + $MinimumSpace$ + " on drive %SystemDrive% needed for " + $ProductId$
+        isFatalError "No Space!"
 else
-	comment "Show product picture"
-	ShowBitmap "%ScriptPath%\" + $ProductName$ + ".png" $ProductName$
+        comment "Space OK"
+endif
+if not( FileExists($InstallProgram$) )
+        LogError "Setupfile NOT exists (" + $InstallProgram$ +")"
+        isFatalError "No Setupfile!"
+else
+        comment "Setupfile OK (exists)"
+endif
+
+if FileExists("%ScriptPath%\delsub.opsiscript")
+	comment "Start uninstall sub section"
+	Sub "%ScriptPath%\delsub.opsiscript"
+endif
 	
-	if FileExists("%ScriptPath%\delsub.opsiscript")
-		comment "Start uninstall sub section"
-		Sub "%ScriptPath%\delsub.opsiscript"
-	endif
-	
-	Message "Installing " + $ProductName$ + " 32 Bit..."
+	Message "installing (new) %installingProdName% 32Bit (%installingProdVersion%)..."
 
 	; wird als decimal erwartet, nicht hex: de (hex: 0407, dec: 1031), en_US (hex: 0409, dec: 1033)
 	; https://msdn.microsoft.com/en-us/goglobal/bb895996.aspx
@@ -83,7 +89,6 @@ else
 			endif
 		endif
 	endif				
-endif
 
 [Winbatch_install]
 "%ScriptPath%\$InstallProgram$" /DS=0 /L=$LCID$ /S
@@ -96,4 +101,3 @@ set_link
  	name: $ProductName$
  	target: $PathToExe$
 end_link
-

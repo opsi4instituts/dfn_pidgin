@@ -13,11 +13,13 @@ if ( count ($ResultList$) = "0" )
 	comment "No installations of " + $SearchPattern$ + " found in registry. Nothing to do ;-)"
 else
 	if (count($ResultList$) = "1")
-		Message "Uninstalling " + $ProductName$ + " 32 Bit..."
+		Message "Uninstalling (old) %installingProdName% 32Bit..."
 		Set $RegId$ = takeSTring(0, $ResultList$)
 
 		Set $UninstallProgram$ = GetRegistryStringValue32("[" + $RegPathUninstall$ + "\" + $RegId$ + "] UninstallString")
 		Set $InstallDir$ = ExtractFilePath($UninstallProgram$)
+		; notwendig, sonst werden einige Dateien nicht geloescht
+		killtask "pidgin.exe"
 		Winbatch_uninstall
 		sub_check_exitcode
 
