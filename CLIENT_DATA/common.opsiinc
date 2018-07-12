@@ -1,44 +1,49 @@
-requiredWinstVersion >= "4.11.4.3"
+requiredWinstVersion >= "4.12.0.16"
 
 DefVar $UninstallProgram$
 DefVar $InstallProgram$
 DefVar $LogDir$
 DefVar $ProductId$
 DefVar $ProductName$
+DefVar $ProductVersion$
+DefVar $InstalledVersion$
 DefVar $MinimumSpace$
 DefVar $InstallDir$
 DefVar $PathToExe$
 DefVar $ExitCode$
-DefVar $RegPathUninstall$
+DefVar $ErrorString$
 DefVar $RegId$
+DefVar $RegBitScope$
 DefVar $MSVersion$
 DefVar $INST_architecture$
 DefVar $INST_SystemType$
 DefVar $CustomPostInstall$
 DefVar $CustomPostDeinstall$
-DefVar $DesktopIcon$
-DefVar $SearchPattern$
+DefVar $DesktopLink$
 DefStringList $ResultList$
+DefVar $LCID$
+DefVar $Language$
+DefStringList $LanguageMap$
+DefVar $System_Language$
 
 Set $INST_SystemType$ = GetSystemType
 set $INST_architecture$ = GetProductProperty("install_architecture","system specific")
 Set $MSVersion$	 = GetMsVersionInfo
 Set $LogDir$ = "%opsiLogDir%"
+Set $ProductVersion$	= takeString(0, splitString("%installingProdVersion%","-"))
+set $DesktopLink$ = getProductProperty("desktop-link","false")
 ; ----------------------------------------------------------------
 Set $ProductId$ = "dfn_pidgin"
-
 ; Showbitmap, Registriy-Search-Pattern, Icon-On-Desktop-Name
 Set $ProductName$ = "Pidgin"
-
 Set $MinimumSpace$ = "60 MB"
-Set $RegPathUninstall$ = "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall"
-
-DefVar	$ProductVersion$
-Set $ProductVersion$	= takeString(0, splitString("%installingProdVersion%","-"))
 Set $InstallProgram$	= "pidgin-" + $ProductVersion$ + "-offline.exe"
 ; ----------------------------------------------------------------
-include_append "section_sub_check_exitcode.opsiinc"
-include_append "section_sub_search_registry32_uninstall_keys.opsiinc"
+
+; exitcode library von UIB (siehe C:\program files(x86)\opsi.org\opsi-client-agent\opsi-winst\lib) mit 'local functions'
+importLib "uib_exitcode.opsiscript"
+; Library registry search uninstall keys (local functions)
+importLib "func_search_registry_uninstall_keys.opsiinc"
 
 if not ($MSVersion$ = "6.1" OR $MSVersion$ = "10.0")
 	Logwarning "Only tested with windows 7 and 10! Please report to the maintainer successful installation on other windows versions."

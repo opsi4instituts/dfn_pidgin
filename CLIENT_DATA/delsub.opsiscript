@@ -1,36 +1,37 @@
-; Copyright (c) uib gmbh (www.uib.de)
-; This sourcecode is owned by uib gmbh
-; and published under the Terms of the General Public License.
-; credits: http://www.opsi.org/credits/
+Message "Searching installation of " + $ProductName$
+; Ergebnis ist StringList (mehrere Einträge möglich);
+; in einer Zeile werden drei Ergebnisse mit "|" abgetrennt geliefert: Registrykey (mit Pfad) | Bereich Registry (kann direkt getRegistryValue übergeben werden | DisplayName
+; z.B. HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Test64|64bit|Test Registry Entry64
+Set $ResultList$ = SearchRegistryUninstallKeys($ProductName$)
 
-Message "Searching installation of " + $ProductName$ + " 32 Bit..."
-Set $SearchPattern$ = $ProductName$
-; Parameter: $SearchPattern$ Suchbegriff in Registry
-Sub_search_registry32_uninstall_keys
-; Rückgabewert: $ResultList$ gefundene Einträge
-	
-if ( count ($ResultList$) = "0" )
-	comment "No installations of " + $SearchPattern$ + " found in registry. Nothing to do ;-)"
-else
-	if (count($ResultList$) = "1")
+Switch count ($ResultList$)
+	Case "0"
+		comment "No installations of " + $ProductName$ + " found in Registry. Nothing to do ;-)"
+	EndCase
+	Case "1"
 		Message "Uninstalling (old) %installingProdName% 32Bit..."
-		Set $RegId$ = takeSTring(0, $ResultList$)
 
-		Set $UninstallProgram$ = GetRegistryStringValue32("[" + $RegPathUninstall$ + "\" + $RegId$ + "] UninstallString")
-		Set $InstallDir$ = ExtractFilePath($UninstallProgram$)
 		; notwendig, sonst werden einige Dateien nicht geloescht
 		killtask "pidgin.exe"
+
+		Set $RegId$ = takeString (0,splitString(takeString(0,$ResultList$), '|'))
+		Set $RegBitScope$ = takeString (1,splitString(takeString(0,$ResultList$), '|'))
+		Set $UninstallProgram$ = GetRegistryValue($RegId$, "UninstallString", $RegBitScope$)
+		Set $InstallDir$ = ExtractFilePath($UninstallProgram$)
+
 		Winbatch_uninstall
-		sub_check_exitcode
+		Set $ExitCode$ = getLastExitCode
+		if stringToBool(isNsisExitcodeFatal($ExitCode$, "True", $ErrorString$))
+			isFatalError
+		endif
 
 		; notwendig, da uninstaller ein paar dateien/verzeichnisse vergisst
 		comment "Delete files"
 		Files_uninstall
 
-		set $DesktopIcon$ = getProductProperty("desktopicon","no")
-		if $DesktopIcon$ = "yes"
+		if $DesktopLink$ = "True"
 			comment "Delete common desktop icon"
-			Linkfolder_uninstall_desktopicon	
+			LinkFolder_delete_desktoplink
 		endif
 
 		comment "include custom post deinstall file"
@@ -40,11 +41,12 @@ else
 				include_insert "%ScriptPath%\custom\" + $CustomPostDeinstall$
 			endif
 		endif
-	else
+	EndCase
+	DefaultCase
 		logError "Found more than one installation! This case is not intended yet in this script! Stop now."
 		isFatalError
-	endif
-endif
+	EndCase
+EndSwitch
 
 [Winbatch_uninstall]
 "$UninstallProgram$" /S
@@ -52,7 +54,7 @@ endif
 [Files_uninstall]
 delete -sf "$InstallDir$\"
 
-[Linkfolder_uninstall_desktopicon]
+[LinkFolder_delete_desktoplink]
 set_basefolder common_desktopdirectory
 set_subfolder ""
 delete_element $ProductName$
